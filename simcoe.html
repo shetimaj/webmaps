@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>Simcoe County recreation and emergency sites </title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+<!-- Load Mapbox -->
+<script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.css' rel='stylesheet' />
+
+<!-- Load Mapbox leaflet draw -->
+<link href='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.2.2/leaflet.draw.css' rel='stylesheet' />
+<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.2.2/leaflet.draw.js'></script>
+
+<!-- Load Esri Leaflet from CDN -->
+<script src="http://cdn-geoweb.s3.amazonaws.com/esri-leaflet/1.0.0-rc.2/esri-leaflet.js"></script>
+
+<!-- Esri Leaflet Geocoder -->
+<script src="http://cdn-geoweb.s3.amazonaws.com/esri-leaflet-geocoder/0.0.1-beta.3/esri-leaflet-geocoder.js"></script>
+<link rel="stylesheet" type="text/css" href="http://cdn-geoweb.s3.amazonaws.com/esri-leaflet-geocoder/0.0.1-beta.3/esri-leaflet-geocoder.css">
+
+<!-- Load Mapquest routing library -->
+<script src="http://www.mapquestapi.com/sdk/leaflet/v1.s/mq-map.js?key=Kmjtd%7Cluua2qu7n9%2C7a%3Do5-lzbgq"></script>
+<script src="http://www.mapquestapi.com/sdk/leaflet/v1.s/mq-routing.js?key=Kmjtd%7Cluua2qu7n9%2C7a%3Do5-lzbgq"></script>
+
+<style>
+  body { margin:0; padding:0; }
+  #map { position:absolute; top:0; bottom:0; width:100%; }
+</style>
+</head>
+<body>
+	<style>
+	.menu-ui {
+	  background:#fff;
+	  position:absolute;
+	  top:10px;right:10px;
+	  z-index:1;
+	  border-radius:3px;
+	  width:120px;
+	  border:1px solid rgba(0,0,0,0.4);
+	  }
+	  .menu-ui a {
+	    font-size:13px;
+	    color:#404040;
+	    display:block;
+	    margin:0;padding:0;
+	    padding:10px;
+	    text-decoration:none;
+	    border-bottom:1px solid rgba(0,0,0,0.25);
+	    text-align:center;
+	    }
+	    .menu-ui a:first-child {
+	      border-radius:3px 3px 0 0;
+	      }
+	    .menu-ui a:last-child {
+	      border:none;
+	      border-radius:0 0 3px 3px;
+	      }
+	    .menu-ui a:hover {
+	      background:#f8f8f8;
+	      color:#404040;
+	      }
+	    .menu-ui a.active {
+	      background:#3887BE;
+	      color:#FFF;
+	      }
+	      .menu-ui a.active:hover {
+	        background:#3074a4;
+	        }
+	        
+	</style>
+<div id='legend' style='display:none;'>
+<table class="formTable">
+	<tr>
+		<td>
+			<strong>Simcoe County</strong>
+			<table>
+				<tr valign="middle">
+					<td><img src="http://maps.simcoe.ca/arcgis/rest/services/Public/Identify_Layers_Dynamic/MapServer/3/images/0b44b2e4ff41369cf8e56c89018bbd6e" /></td>
+					<td>Jurisdiction</td>
+				</tr>
+			</table>
+			<table>
+				<p><small><i>Emergency Services</i></small></p>
+				<tr valign="middle">
+					<td><img src="http://maps.simcoe.ca/arcgis/rest/services/Public/Operational_Layers_Dynamic/MapServer/4/images/39af81be3cb9d2de0f51af22c9c106ce" /></td>
+					<td>Police Station</td>
+				</tr>
+				<tr valign="middle">
+					<td><img src="http://maps.simcoe.ca/arcgis/rest/services/Public/Operational_Layers_Dynamic/MapServer/5/images/99d1d0f77efa3dfed6683c5050128c52" /></td>
+					<td>Paramedic Station </td>
+				</tr>
+				<tr valign="middle">
+					<td><img src="http://maps.simcoe.ca/arcgis/rest/services/Public/Operational_Layers_Dynamic/MapServer/6/images/53ad40e02696e7c87b10c9a3ca02d43f" /></td>
+					<td>Hospital </td>
+				</tr>
+			</table>
+			<hr />
+			<table>
+				<p><small><i>Hiking Trails</i></small></p>
+				<tr valign="middle">
+					<td><img src="http://maps.simcoe.ca/arcgis/rest/services/Public/Operational_Layers_Dynamic/MapServer/20/images/4ead76792946a212005bd62c21a80082" /></td>
+					<td>Municipal Trail </td>
+				</tr>
+				<tr valign="middle">
+					<td><img src="http://maps.simcoe.ca/arcgis/rest/services/Public/Operational_Layers_Dynamic/MapServer/22/images/6aafd615858c6a601066da73f567908f" /></td>
+					<td>Ganaraska Trail</td>
+				</tr>
+				<tr valign="middle">
+					<td><img src="http://maps.simcoe.ca/arcgis/rest/services/Public/Operational_Layers_Dynamic/MapServer/23/images/ad399f13f3089f1eca4b6ee047893d6a" /></td>
+					<td>HTG Loop Trail</td>
+				</tr>
+				<tr valign="middle">
+					<td><img src="http://maps.simcoe.ca/arcgis/rest/services/Public/Operational_Layers_Dynamic/MapServer/24/images/2cb9263f781ce2139cc142cfe9f45292" /></td>
+					<td>Trans Canada Trail</td>
+				</tr>
+				<tr valign="middle">
+					<td><img src="http://maps.simcoe.ca/arcgis/rest/services/Public/Operational_Layers_Dynamic/MapServer/25/images/c0afb2e7e18a27da45b2342e560160e8" /></td>
+					<td>9 Mile Portage Trail</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</div>
+<div id='map'>
+  <nav id='map-ui' class='menu-ui'>
+    <a href='#' class='active' id='emerg' title="Click to toggle layer">Emergency </a>
+    <a href='#' class='active' id='hike' title="Click to toggle layer">Hiking</a>
+  </nav>
+</div>
+<script>
+L.mapbox.accessToken = 'pk.eyJ1Ijoic3Rla3VuZSIsImEiOiJOclRGbWZ3In0.aZ4Olx1-RXCDDHyh8W1mUg';
+var dir;
+var map = L.mapbox.map('map', 'examples.map-i86nkdio')
+    .setView([44.44, -79.69], 10);
+
+// Adding grey base layer for better contrast
+
+L.mapbox.tileLayer('examples.map-20v6611k').addTo(map);
+
+// Adding Simcoe County Jurisdiction layer
+L.esri.dynamicMapLayer('http://maps.simcoe.ca/arcgis/rest/services/Public/Identify_Layers_Dynamic/MapServer', {
+    opacity: 0.3,
+    layers: [3]
+}).addTo(map);
+    
+// Adding Emergency Services 
+var emerg = L.esri.dynamicMapLayer('http://maps.simcoe.ca/arcgis/rest/services/Public/Operational_Layers_Dynamic/MapServer', {
+    opacity: 1,
+    layers: [4,5,6]
+}).addTo(map);
+
+// Adding hiking trails  
+var hike = L.esri.dynamicMapLayer('http://maps.simcoe.ca/arcgis/rest/services/Public/Operational_Layers_Dynamic/MapServer', {
+    opacity: 1,
+    layers: [20, 22, 23, 24, 25]
+}).addTo(map);
+
+
+// Layer switcher for dynamic layers added above
+
+document.getElementById('emerg').onclick = function () {
+    var enable = this.className !== 'active';
+    emerg.setOpacity(enable ? 1 : 0);
+    this.className = enable ? 'active' : '';
+    return false;
+};
+
+document.getElementById('hike').onclick = function () {
+    var enable = this.className !== 'active';
+    hike.setOpacity(enable ? 1 : 0);
+    this.className = enable ? 'active' : '';
+    return false;
+};
+
+
+// Adding draw function and features editor.
+var featureGroup = L.featureGroup().addTo(map);
+
+var drawControl = new L.Control.Draw({
+    edit: {
+    featureGroup: featureGroup
+    }
+}).addTo(map);
+
+map.on('draw:created', function(e) {
+    featureGroup.addLayer(e.layer);
+});
+
+
+// Add Legend of units to map
+map.legendControl.addLegend(document.getElementById('legend').innerHTML);
+
+
+
+// create the geocoding control and add it to the map
+var searchControl = new L.esri.Controls.Geosearch().addTo(map);
+
+// create an empty layer group to store the results and add it to the map
+var results = new L.LayerGroup().addTo(map);
+
+// listen for the results event and add every result to the map
+searchControl.on("results", function(data){
+    results.clearLayers();
+    for (var i = data.results.length - 1; i >= 0; i--) {
+    	
+        results.addLayer(L.marker(data.results[i].latlng));
+    };
+});
+
+
+
+// Add mapquest routing service to map 
+
+dir = MQ.routing.directions();
+ 
+  dir.route({
+      locations: [
+          '97 collier st, barrie on',
+          '57 colborne st, orillia on'
+      ]
+  }).addTo(map);
+ 
+  MQ.routing.routeLayer({
+      directions: dir,
+      fitBounds: true
+  }).addTo(map);
+
+</script>
+</body>
+</html>

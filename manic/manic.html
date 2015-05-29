@@ -1,0 +1,930 @@
+
+<!DOCTYPE html>
+
+<html lang="en-US">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Manicouagan-Outardes Hydroelectric complex</title>
+        
+<!-- Google fonts library for text -->
+<link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
+<style type="text/css">
+		
+body {font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-size:20px; margin:0;padding:0;}
+ 
+h2 {font-family: 'Roboto Slab', serif;}
+h3 {font-family: 'Roboto Slab', serif; color:white; font-size:64px;padding-top:400px;}
+
+
+/*Set map to take entire page */			
+#map-canvas {
+width: 100%;
+height: 100%;
+z-index: 0;
+}
+
+#title {
+width: 100%;
+height: 100%;
+background-color:#fff;
+position: absolute;
+background: url(img/manic2-01.jpg) no-repeat center center fixed; 
+-webkit-background-size: cover;
+-moz-background-size: cover;
+-o-background-size: cover;
+background-size: cover;
+}
+
+/* Declaring map as fixed */
+
+#fixedContainer
+{
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  right: 0%;
+  top: 0%;
+  
+}
+
+/* Section to hold information */
+#leftcolumn {
+padding-top:80%
+}
+
+/* Styling information content */
+#content {
+width:40%;
+background-color:#000;
+color:#fff;
+padding:15px;
+margin-left: 20px;
+margin-bottom: 200px;
+opacity: 0.8;
+border-bottom: 1px solid grey;
+border-right: 1px solid grey;
+border-radius: 5px;
+z-index: 3;
+}
+
+#content2 {
+width:100%;
+height: 120%;
+background-color:#fff;
+position: absolute;
+background: url(outa.jpg) no-repeat center center fixed; 
+-webkit-background-size: cover;
+-moz-background-size: cover;
+-o-background-size: cover;
+background-size: cover;
+}
+
+#attribution {
+padding:15px;
+background-color:#fff;
+color:#000;
+}
+</style>
+		
+		
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+<script type="text/javascript">
+    
+    
+	  /* NOTE: There are few snippets of code which do not partain to the web map but are included 
+	   * because application would not run otherwise. I have made notation on all unnecessary objects
+	   */ 	    
+		
+	  var astorPlace = new google.maps.LatLng(51.6857485,-70.0161736);
+		
+      function initialize() {
+        var mapOptions = {
+          center: new google.maps.LatLng(51.6857485,-70.0161736),
+          zoom: 5,
+		  scrollwheel: false,
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+		  zoomControl: true,
+    	  zoomControlOptions: {
+          style: google.maps.ZoomControlStyle.SMALL,
+          position: google.maps.ControlPosition.RIGHT_TOP
+    	  },
+		  panControl: false,
+		  streetViewControl: false,
+    	  
+        };
+        
+        // Set map
+		
+        var map = new google.maps.Map(document.getElementById("map-canvas"),
+            mapOptions);
+			
+		panorama = map.getStreetView();  	// Initialize Google street view
+  		panorama.setPosition(astorPlace);	// Set position to placeholder
+ 		panorama.setPov(({					// Placeholder position options
+    	heading: 90,
+    	pitch: 0,
+		zoom:0
+  		}));
+	
+		
+		// Not part of application as stated above
+  		var triangleCoords = [];
+		// Not part of application as stated above
+ 		bermudaTriangle = new google.maps.Polygon({
+    	paths: triangleCoords,
+    	strokeColor: '#FF0000',
+    	strokeOpacity: 0.8,
+    	strokeWeight: 2,
+    	fillColor: '#FF0000',
+    	fillOpacity: 0.35
+  		});
+
+ 		bermudaTriangle.setMap(map);
+		
+		// Not part of application
+		var redCoords = [];
+
+  		// Not part of application
+  		new google.maps.Polygon({
+    	map: map,
+    	paths: redCoords,
+    	strokeColor: '#426048',
+    	strokeOpacity: 0.8,
+    	strokeWeight: 2,
+    	fillColor: '#426048',
+    	fillOpacity: 0.8,
+    	draggable: true,
+    	geodesic: true
+  		});
+ 	
+		
+		// Not part of application	
+	 	var flightPlanCoordinates = [];
+  		var flightPath = [];
+	
+		// Object for KML layer
+		var kmlLayer;
+		var markers = [];
+		var markers1 = [];
+		
+		/*jQuery waypoint plugin detects which direction the webpage is being scrolled and detects the
+		 * top or bottom of <div> blocks to initialize a function */
+		
+		// Setting the first div to initialize when page is scrolled up from lower sections
+		$('.original').waypoint(function(direction) {
+  		if (direction === 'up') {
+    		map.setCenter( new google.maps.LatLng(51.6857485,-70.0161736));
+    		map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+			map.setZoom(5);
+			kmlLayer.setMap(null);			// Disable KML layer to avoid interference with map
+  		}
+		}, { offset: '20%' });
+		
+		
+		/* Setting the second div to detect when its top reaches top of browser window(Downward scroll)
+		 * All subsequent map options are placed within each successive div
+		 */	
+		$('.zoomin').waypoint(function(direction) {
+  		if (direction === 'down') {
+    		map.setCenter( new google.maps.LatLng(51.376253, -69.130595));
+			map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+			map.setZoom(9);		
+  		}
+		
+		}, { offset: '50%' });
+		
+		// Setting the second div to detect when its bottom reaches bottom of browser window(Upward scroll).		
+		$('.zoomin').waypoint(function(direction) {
+  		if (direction === 'up') {
+    		map.setCenter( new google.maps.LatLng(51.376253, -69.130595));
+    		map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+			map.setZoom(9);
+			panorama.setVisible(false);		// Disable google streetview to avoid interference with map
+			kmlLayer.setMap(null);			// Disable KML layer to avoid interference with map
+  		}
+		}, { offset: '20%' });
+		
+		
+		$('.streetview4').waypoint(function(direction) {
+  		if (direction === 'down') {
+   			panorama.setVisible(true); 		// Enable streetview 
+			var vatican = new google.maps.LatLng(50.6413817,-68.7308728);
+			panorama = map.getStreetView();
+			panorama.setPosition(vatican);
+			panorama.setPov({
+    		heading: 5,
+    		zoom:1,
+    		pitch:0}
+    		);
+  		}
+		}, { offset: '50%' });
+		
+		$('.streetview4').waypoint(function(direction) {
+  		if (direction === 'up') {
+   			panorama.setVisible(true);		 // Enable streetview
+			var vatican = new google.maps.LatLng(50.6413817,-68.7308728);
+			panorama = map.getStreetView();
+			panorama.setPosition(vatican);
+			panorama.setPov({
+    		heading: 5,
+    		zoom:1,
+    		pitch:0}
+    		);
+  		}
+		}, { offset: '20%' });
+		
+		$('.maptype').waypoint(function(direction) {
+  		if (direction === 'down') {
+   			map.setCenter( new google.maps.LatLng(49.747362, -68.619902));
+			map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+			map.setZoom(14);
+			panorama.setVisible(false);		// Disable streetview to avoid interference with map
+			
+			// Set marker to display image	
+			var marker1 = new google.maps.Marker({					
+		        position: new google.maps.LatLng(49.751078, -68.609002),    
+		        title: 'Click for image'
+	    	  });
+	    	marker1.setMap(map);
+	    	
+	    	// Place marker in first markers array so it can be reset between map views
+	    	markers.push(marker1);
+	    	var contentString = '<div>'+ '<img src="img/manic3-01.jpg">' + '</div>';  
+	    	var infowindow = new google.maps.InfoWindow({
+			    content: contentString
+			  });
+			google.maps.event.addListener(marker1, 'click', function() {
+ 			   infowindow.open(map,marker1);
+  			});
+  		}
+		}, { offset: '50%' });
+		
+		$('.maptype').waypoint(function(direction) {
+  		if (direction === 'up') {
+			map.setCenter( new google.maps.LatLng(49.747362, -68.619902));
+			map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+			map.setZoom(14);
+			panorama.setVisible(false);		// Disable streetview to avoid interference with map
+			kmlLayer.setMap(null);			// Disable KML layer to avoid interference with map
+			
+			// Set marker to display image	
+			var marker1 = new google.maps.Marker({					
+		        position: new google.maps.LatLng(49.751078, -68.609002),    
+		        title: 'Click for image'
+	    	  });
+	    	marker1.setMap(map);
+	    	
+	    	// Place marker in first markers array so it can be reset between map views
+	    	markers.push(marker1);
+	    	var contentString = '<div>'+ '<img src="img/manic3-01.jpg">' + '</div>';  
+	    	var infowindow = new google.maps.InfoWindow({
+			    content: contentString
+			  });
+			google.maps.event.addListener(marker1, 'click', function() {
+ 			   infowindow.open(map,marker1);
+  			});
+  		}
+		}, { offset: '20%' });
+		
+		
+		
+		$('.streetview5').waypoint(function(direction) {
+  		if (direction === 'down') {
+   			panorama.setVisible(true);		// Enable streetview
+			var vatican = new google.maps.LatLng(49.3183658,-68.3507464);
+			panorama = map.getStreetView();
+			panorama.setPosition(vatican);
+			panorama.setPov({
+    		heading: 25,
+    		zoom:1,
+    		pitch:0}
+    		);
+    		
+    		// Looks for any markers from above map view and removes it from map
+    		for (var i = 0; i < markers.length; i++) {
+			    markers[i].setMap(null);
+			}
+  		}
+		}, { offset: '50%' });
+		
+		$('.streetview5').waypoint(function(direction) {
+  		if (direction === 'up') {
+   			panorama.setVisible(true);		// Enable streetview
+			var vatican = new google.maps.LatLng(49.3183658,-68.3507464);
+			panorama = map.getStreetView();
+			panorama.setPosition(vatican);
+			panorama.setPov({
+    		heading: 25,
+    		zoom:1,
+    		pitch:0}
+    		);
+    		// Looks for any markers from below map view and removes it from map
+    		for (var i = 0; i < markers.length; i++) {
+			    markers[i].setMap(null);
+			}
+  		}
+		}, { offset: '20%' });
+		
+		
+		
+		$('.maptype2').waypoint(function(direction) {
+  		if (direction === 'down') {
+   			map.setCenter( new google.maps.LatLng(49.191043, -68.333544));
+			map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+			map.setZoom(14);
+			panorama.setVisible(false);		// Disable streetview to avoid interference with map
+			
+			// Set marker to display image
+			var marker1 = new google.maps.Marker({
+		        position: new google.maps.LatLng(49.191565, -68.329531),
+		        title: 'Click for image'
+	    	  });
+	    	marker1.setMap(map);
+	    	markers.push(marker1);
+	    	var contentString = '<div>'+ '<img src="img/manic1-01.jpg">' + '</div>';  
+	    	var infowindow = new google.maps.InfoWindow({
+			    content: contentString
+			  });
+			google.maps.event.addListener(marker1, 'click', function() {
+ 			   infowindow.open(map,marker1);
+  			});
+  		}
+		}, { offset: '50%' });
+		
+		$('.maptype2').waypoint(function(direction) {
+  		if (direction === 'up') {
+			map.setCenter( new google.maps.LatLng(49.191043, -68.333544));
+			map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+			map.setZoom(14);
+			panorama.setVisible(false);
+			kmlLayer.setMap(null);			// Disable KML layer to avoid interference with map
+			
+			// Set marker to display image
+			var marker1 = new google.maps.Marker({
+		        position: new google.maps.LatLng(49.191565, -68.329531),
+		        title: 'Click for image'
+	    	  });
+	    	marker1.setMap(map);
+	    	markers.push(marker1);
+	    	var contentString = '<div>'+ '<img src="img/manic1-01.jpg">' + '</div>';  
+	    	var infowindow = new google.maps.InfoWindow({
+			    content: contentString
+			  });
+			google.maps.event.addListener(marker1, 'click', function() {
+ 			   infowindow.open(map,marker1);
+  			});
+  		}
+		}, { offset: '20%' });
+		
+		
+		$('.zoomin2').waypoint(function(direction) {
+  		if (direction === 'down') {
+    		map.setCenter( new google.maps.LatLng(50.593506, -71.464073));
+			map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+			map.setZoom(8);
+			
+			// Looks for any markers from above map view and removes it from map
+    		for (var i = 0; i < markers.length; i++) {
+			    markers[i].setMap(null);
+			}
+			
+			// Add KML layer to map to show watershed
+			kmlLayer = new google.maps.KmlLayer({
+			    url: 'https://s3.amazonaws.com/manicougan/outar.kml',
+			    suppressInfoWindows: true
+			  });
+			kmlLayer.setMap(map);		
+  		}
+		
+		}, { offset: '50%' });
+		
+		$('.zoomin2').waypoint(function(direction) {
+  		if (direction === 'up') {
+    		map.setCenter( new google.maps.LatLng(50.593506, -71.464073));
+    		map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+			map.setZoom(8);
+			
+			// Looks for any markers from above map view and removes it from map
+    		for (var i = 0; i < markers.length; i++) {
+			    markers[i].setMap(null);
+			}
+			
+			// Add KML layer to map to show watershed
+			kmlLayer = new google.maps.KmlLayer({
+			    url: 'https://s3.amazonaws.com/manicougan/outar.kml',
+			    suppressInfoWindows: true
+			  });
+			kmlLayer.setMap(map);
+  		}
+		}, { offset: '20%' });
+		
+
+
+		$('.maptype3').waypoint(function(direction) {
+  		if (direction === 'down') {
+   			map.setCenter( new google.maps.LatLng(49.699145, -68.960939));
+			map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+			map.setZoom(13);
+			kmlLayer.setMap(null);			// Disable KML layer to avoid interference with map
+			
+			// Set marker to display image		
+			var marker1 = new google.maps.Marker({
+		        position: new google.maps.LatLng(49.674226, -68.923313),
+		        title: 'Click for image'
+	    	  });
+	    	marker1.setMap(map);
+	    	markers.push(marker1);
+	    	var contentString = '<div>'+ '<img src="img/outardes4-01.jpg">' + '</div>';  
+	    	var infowindow = new google.maps.InfoWindow({
+			    content: contentString
+			  });
+			google.maps.event.addListener(marker1, 'click', function() {
+ 			   infowindow.open(map,marker1);
+  			});
+  			
+  			// Set marker to display information
+  			var marker2 = new google.maps.Marker({
+		        position: new google.maps.LatLng(49.703725, -68.903604),
+		        title: 'Click for information'
+	    	  });
+	    	marker2.setMap(map);
+	    	markers.push(marker2);
+	    	var contentString2 = 'Location of power generating station';  
+	    	var infowindow2 = new google.maps.InfoWindow({
+			    content: contentString2
+			  });
+			google.maps.event.addListener(marker2, 'click', function() {
+ 			   infowindow2.open(map,marker2);
+  			});
+  		}
+		}, { offset: '50%' });
+		
+		$('.maptype3').waypoint(function(direction) {
+  		if (direction === 'up') {
+			map.setCenter( new google.maps.LatLng(49.699145, -68.960939));
+			map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+			map.setZoom(13);
+			
+			kmlLayer.setMap(null);			// Disable KML layer to avoid interference with map
+			
+			// Set marker to display image		
+			var marker1 = new google.maps.Marker({
+		        position: new google.maps.LatLng(49.674226, -68.923313),
+		        title: 'Click for image'
+	    	  });
+	    	marker1.setMap(map);
+	    	markers.push(marker1);
+	    	var contentString = '<div>'+ '<img src="img/outardes4-01.jpg">' + '</div>';  
+	    	var infowindow = new google.maps.InfoWindow({
+			    content: contentString
+			  });
+			google.maps.event.addListener(marker1, 'click', function() {
+ 			   infowindow.open(map,marker1);
+  			});
+  			
+  			// Set marker to display information
+  			var marker2 = new google.maps.Marker({
+		        position: new google.maps.LatLng(49.703725, -68.903604),
+		        title: 'Click for information'
+	    	  });
+	    	marker2.setMap(map);
+	    	markers.push(marker2);
+	    	var contentString2 = 'Location of power generating station';  
+	    	var infowindow2 = new google.maps.InfoWindow({
+			    content: contentString2
+			  });
+			google.maps.event.addListener(marker2, 'click', function() {
+ 			   infowindow2.open(map,marker2);
+  			});
+  		}
+		}, { offset: '20%' });
+		
+		
+		$('.maptype4').waypoint(function(direction) {
+  		if (direction === 'down') {
+   			map.setCenter( new google.maps.LatLng(49.563610, -68.755376));
+			map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+			map.setZoom(15);
+			kmlLayer.setMap(null);			// Disable KML layer to avoid interference with map
+			
+			// Set marker to display information
+			var marker1 = new google.maps.Marker({
+		        position: new google.maps.LatLng(49.562768, -68.752640),
+		        title: 'Click for image'
+	    	  });
+	    	marker1.setMap(map);
+	    	markers.push(marker1);
+	    	var contentString = '<div>'+ '<img src="img/outardes3-01.jpg">' + '</div>';  
+	    	var infowindow = new google.maps.InfoWindow({
+			    content: contentString
+			  });
+			google.maps.event.addListener(marker1, 'click', function() {
+ 			   infowindow.open(map,marker1);
+  			});
+  		}
+		}, { offset: '50%' });
+		
+		$('.maptype4').waypoint(function(direction) {
+  		if (direction === 'up') {
+			map.setCenter( new google.maps.LatLng(49.563610, -68.755376));
+			map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+			map.setZoom(15);
+			kmlLayer.setMap(null);			// Disable KML layer to avoid interference with map
+			
+			// Set marker to display information
+			var marker1 = new google.maps.Marker({
+		        position: new google.maps.LatLng(49.562768, -68.752640),
+		        title: 'Click for image'
+	    	  });
+	    	marker1.setMap(map);
+	    	markers.push(marker1);
+	    	var contentString = '<div>'+ '<img src="img/outardes3-01.jpg">' + '</div>';  
+	    	var infowindow = new google.maps.InfoWindow({
+			    content: contentString
+			  });
+			google.maps.event.addListener(marker1, 'click', function() {
+ 			   infowindow.open(map,marker1);
+  			});
+  		}
+		}, { offset: '20%' });
+		
+		$('.maptype5').waypoint(function(direction) {
+  		if (direction === 'down') {
+   			map.setCenter( new google.maps.LatLng(49.147517, -68.397282));
+			map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+			map.setZoom(15);
+			kmlLayer.setMap(null);			// Disable KML layer to avoid interference with map
+			
+			// Set marker to display information
+			var marker1 = new google.maps.Marker({
+		        position: new google.maps.LatLng(49.144598, -68.389643),
+		        title: 'Click for image'
+	    	  });
+	    	marker1.setMap(map);
+	    	markers.push(marker1);
+	    	var contentString = '<div>'+ '<img src="img/outardes2-01.jpg">' + '</div>';  
+	    	var infowindow = new google.maps.InfoWindow({
+			    content: contentString
+			  });
+			google.maps.event.addListener(marker1, 'click', function() {
+ 			   infowindow.open(map,marker1);
+  			});
+  		}
+		}, { offset: '50%' });
+		
+		$('.maptype5').waypoint(function(direction) {
+  		if (direction === 'up') {
+			map.setCenter( new google.maps.LatLng(49.147517, -68.397282));
+			map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+			map.setZoom(15);
+			kmlLayer.setMap(null);
+			
+			// Set marker to display information
+			var marker1 = new google.maps.Marker({
+		        position: new google.maps.LatLng(49.144598, -68.389643),
+		        title: 'Click for image'
+	    	  });
+	    	marker1.setMap(map);
+	    	markers.push(marker1);
+	    	var contentString = '<div>'+ '<img src="img/outardes2-01.jpg">' + '</div>';  
+	    	var infowindow = new google.maps.InfoWindow({
+			    content: contentString
+			  });
+			google.maps.event.addListener(marker1, 'click', function() {
+ 			   infowindow.open(map,marker1);
+  			});
+  			
+			// Looks for all markers from below map view and removes it from map
+    		for (var i = 0; i < markers.length; i++) {
+			    markers1[i].setMap(null);
+			}
+  		}
+		}, { offset: '20%' });
+		
+		
+		$('.maptype6').waypoint(function(direction) {
+  		if (direction === 'down') {
+   			map.setCenter( new google.maps.LatLng(49.845919, -70.469879));
+			map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+			map.setZoom(9);
+			kmlLayer = new google.maps.KmlLayer({
+			    url: 'https://s3.amazonaws.com/manicougan/combine.kml',
+			    suppressInfoWindows: true
+			  });
+			kmlLayer.setMap(map);
+			
+			// Looks for any markers from above map view and removes it from map
+    		for (var i = 0; i < markers.length; i++) {
+			    markers[i].setMap(null);
+			}
+			
+			// Following series of markers represent all the dams and generating stations in the region.
+			var man5 = new google.maps.Marker({
+		        position: new google.maps.LatLng(50.6413817,-68.7308728),
+		        title: 'Click for information'
+	    	  });
+	    	man5.setMap(map);
+	    	
+	    	// Place markers into second markers array
+	    	markers1.push(man5);
+	    	var contentString = 'Daniel-Johnson(Manic-5)';  
+	    	var infowindow = new google.maps.InfoWindow({
+			    content: contentString
+			  });
+			google.maps.event.addListener(man5, 'click', function() {
+ 			   infowindow.open(map,man5);
+  			});
+  			
+  			var man3 = new google.maps.Marker({
+		        position: new google.maps.LatLng(49.747362, -68.619902),
+		        title: 'Click for information'
+	    	  });
+	    	man3.setMap(map);
+	    	markers1.push(man3);
+	    	var contentString2 = 'René-Lévesque generating station(Manic-3)';  
+	    	var infowindow2 = new google.maps.InfoWindow({
+			    content: contentString2
+			  });
+			google.maps.event.addListener(man3, 'click', function() {
+ 			   infowindow2.open(map,man3);
+  			});
+  			var man2 = new google.maps.Marker({
+		        position: new google.maps.LatLng(49.3183658,-68.3507464),
+		        title: 'Click for information'
+	    	  });
+	    	man2.setMap(map);
+	    	markers1.push(man2);
+	    	var contentString3 = 'Jean-Lesage generating station(Manic-2)';  
+	    	var infowindow3 = new google.maps.InfoWindow({
+			    content: contentString3
+			  });
+			google.maps.event.addListener(man2, 'click', function() {
+ 			   infowindow3.open(map,man2);
+  			});
+  			var man1 = new google.maps.Marker({
+		        position: new google.maps.LatLng(49.191565, -68.329531),
+		        title: 'Click for information'
+	    	  });
+	    	man1.setMap(map);
+	    	markers1.push(man1);
+	    	var contentString4 = 'Manic-1';  
+	    	var infowindow4 = new google.maps.InfoWindow({
+			    content: contentString4
+			  });
+			google.maps.event.addListener(man1, 'click', function() {
+ 			   infowindow4.open(map,man1);
+  			});
+  			var out4 = new google.maps.Marker({
+		        position: new google.maps.LatLng(49.703725, -68.903604),
+		        title: 'Click for information'
+	    	  });  	  
+	    	out4.setMap(map);
+	    	markers1.push(out4);
+	    	var contentString5 = 'Outardes-4';  
+	    	var infowindow5 = new google.maps.InfoWindow({
+			    content: contentString5
+			  });
+			google.maps.event.addListener(out4, 'click', function() {
+ 			   infowindow5.open(map,out4);
+  			});
+  			var out3 = new google.maps.Marker({
+		        position: new google.maps.LatLng(49.562768, -68.752640),
+		        title: 'Click for information'
+	    	  });
+	    	out3.setMap(map);
+	    	markers1.push(out3);
+	    	var contentString6 = 'Outardes-3';  
+	    	var infowindow6 = new google.maps.InfoWindow({
+			    content: contentString6
+			  });
+			google.maps.event.addListener(out3, 'click', function() {
+ 			   infowindow6.open(map,out3);
+  			});
+  			var out2 = new google.maps.Marker({
+		        position: new google.maps.LatLng(49.144598, -68.389643),
+		        title: 'Click for information'
+	    	  });
+	    	out2.setMap(map);
+	    	markers1.push(out2);
+	    	var contentString7 = 'Outardes-2';  
+	    	var infowindow7 = new google.maps.InfoWindow({
+			    content: contentString7
+			  });
+			google.maps.event.addListener(out2, 'click', function() {
+ 			   infowindow7.open(map,out2);
+  			});
+  		}
+		}, { offset: '50%' });
+		
+		$('.maptype6').waypoint(function(direction) {
+  		if (direction === 'up') {
+			map.setCenter( new google.maps.LatLng(49.845919, -70.469879));
+			map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+			map.setZoom(15);
+  		}
+		}, { offset: '20%' });
+		
+ 
+      }
+	  
+      google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+		
+		
+</head>
+<body>
+	<div id="fixedContainer">
+		<div id="map-canvas"></div>
+	</div>
+	<div id="title">
+	        <h3>&nbsp;&nbsp;&nbsp;Manicouagan-Outardes Hydroelectric complex</h3>
+	        
+	</div>		
+	<div id="leftcolumn">
+		<div class="original"></div>
+		<div id="content">
+			<p><a href="http://en.wikipedia.org/wiki/Hydro-Qu%C3%A9bec">Hydro-Québec</a> is Government of Quebec-owned public utility based in Montreal, it is the largest electricity generator in Canada and the 
+		  	world's largest hydroelectric producer.</p> <br />
+		  	<p>The company operates 60 hydroelectric generating stations with an installed capacity of 35,125 MegaWatts(MW) of power</p>	
+		 
+		</div>
+			<div class="zoomin"></div>
+		<div id="content">	
+			<h2>Manicouagan Reservoir</h2>
+				
+		    <p>
+		    	The Reservoir lies within the remnant of an ancient eroded impact crater (astrobleme). 
+		    	The crater was formed following the impact of a 5 kilometres (3.1 mi) diameter asteroid which excavated a crater originally about 100 km (62 mi) wide, 
+		    	although erosion and deposition of sediments have since reduced the visible diameter to about 72 km (45 mi). It is the sixth-largest confirmed 
+		    	impact crater known on earth.
+		    </p>
+		    </div>	 
+		<div id="content2">
+		<h3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Manicouagan Dam Series</h3>
+		
+		</div> 
+			    
+		<div style="margin-top: 90%;" id="content">
+		<div class="streetview4"></div>		
+		    <h2>Daniel-Johnson Dam</h2>
+		      
+		    <p>This was formerly known as Manic-5 and it was constructed between 1959 and 1970. It has two powerhouses Manic-5(1,528MW of power) and Manic-5-PA(PA=puissance additionnelle/additional power)
+		    	which produce 1,528MW and 1,064MW of power respectively.
+		    </p> 
+		    <p>It lead to the flooding of the Manicouagan crater and resulted in the Manicouagan reservoir which feeds the other generators downstream 
+		    </p>
+		</div>	
+		    <div class="maptype"></div>
+		<div id="content">
+		<h2>René-Lévesque generating station</h2>	
+		    <p>This was formerly known as Manic-3 and was built between 1970 and 1976. It is located further downstream on the Manicougan river and 
+		    	it generates 1244MW of power from 6 <a href="http://en.wikipedia.org/wiki/Francis_turbine">Francis Turbine</a> engines
+		    </p> 
+			
+		</div>	
+			<div class="streetview5"></div>
+		<div id="content">	
+		    <h2>Jean-Lesage generating station</h2>
+		      
+			 
+		    <p>Formerly known as Manic-2 and was built between 1965 and 1967, it is located near the mouth of Manicougan River into the St. Lawrence river <br>
+		    It generates 1,145MW of power from 8 Francis-type turbine engines
+		</div>
+		
+			<div class="maptype2"></div>
+		<div id="content">	
+		    <h2>Manic-1</h2>
+		      
+			 
+		    <p>Manic-1 is a hydroelectric power station and dam at the mouth of the Manicouagan River 3 km (1.9 mi) west of Baie-Comeau, Quebec. The power station was commissioned between 1966 and 1967 and 
+		    	producing 184 MW, it is the smallest of the Manicouagan-Outardes complex.<br>
+		      
+			
+		</div>
+		
+		<div class="zoomin2"></div>
+		<div id="content">	
+			<h2>Outardes River</h2>
+				
+		    <p>
+		    	This river originates in the Otish Mountains and flows southerly into the St.Lawrence River at Outardes bay 20 Km south west of Baie-Comeau, Quebec.
+		    	Midway along the river course it widens to form the Outardes 4 reservoir which powers the generating stations on this branch
+		    </p>
+		    </div>	 
+		<div id="content2">
+		<h3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Outardes Dam Series</h3>
+		
+		</div>
+		
+			<div class="maptype3"></div>
+		<div style="margin-top: 90%;" id="content">	
+		    <h2>Outardes-4</h2>
+		      
+			 
+		    <p>This was built in 1969 and it is located on the Outardes river which lies to the west of
+		    	Manicouagan river. It has 4 Francis turbines and has 785MW power generating capacity <br>
+		      
+			
+		</div>
+		
+			<div class="maptype4"></div>
+		<div id="content">	
+		    <h2>Outardes-3</h2>
+		      
+			 
+		    <p>This was also built in 1969 and is slightly over 20 Km downstream of Outardes-4.
+		    	It has a higher power generating capacity of 1,026MW and also runs on the same four Francis turbines as
+		    	Outardes-4  
+			
+		</div>
+		
+			<div class="maptype5"></div>
+		<div id="content">	
+		    <h2>Outardes-2</h2>
+		      
+			 
+		    <p>This is the smallest dam along the Outardes river and has second smallest power capacity in the Manicouagan-Outardes complex
+		    	at 523MW. 
+			
+		</div>
+			<div class="maptype6"></div>
+		<div id="content">	
+		    <h2>Hydroelectric Complex</h2>
+		      
+			<p>All the dams and generating stations within the Manicouagan watershed.</p> 
+		    <p></p>
+		      
+		     
+		<div id="attribution">	  
+		<p>Credits: <a href="http://googlemapsmania.blogspot.co.uk/">Maps Mania</a>;  <br> 
+			All images are courtesy of <a href="http://www.hydroquebec.com/generation/centrale-hydroelectrique.html">Hydro-Quebec</a>
+			<p>Additional information can be found on Wikipedia: <a href="http://en.wikipedia.org/wiki/Manicouagan_Reservoir">Manicouagan Reservoir</a>; <br />
+				<a href="http://en.wikipedia.org/wiki/Rivi%C3%A8re_aux_Outardes">Outardes River</a>; <br />
+				<a href="http://en.wikipedia.org/wiki/Daniel-Johnson_Dam">Daniel-Johnson Dam</a>; <br />
+				<a href="http://en.wikipedia.org/wiki/Outardes-4">Outardes-4</a>
+		</div>	
+		</div>
+		
+			  <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		      <br>
+		
+	  </div>
+	
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+	<script src="waypoints.min.js"></script>
+
+
+</body>
+</html>
